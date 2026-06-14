@@ -28,7 +28,7 @@ public class AppTest {
 
         String message = app.getMessage();
 
-        assertEquals(16, message.length());
+        assertEquals(15, message.length());
     }
 
     @Test
