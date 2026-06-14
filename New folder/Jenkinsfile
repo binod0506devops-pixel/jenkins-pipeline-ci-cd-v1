@@ -7,7 +7,6 @@ pipeline {
     }
 
     stages {
-
         // Stage 1: Source Code Checkout
         stage('Checkout') {
             steps {
@@ -34,8 +33,19 @@ pipeline {
             }
         }
 
-        // You can add more stages below, like SonarQube, Docker, etc.
-
+        // Stage 4: Static Code Analysis (SonarQube)
+        stage('Static Code Analysis') {
+            steps {
+                dir('New folder') {
+                    withSonarQubeEnv('sonarqube') {
+                        sh 'mvn sonar:sonar \
+                            -Dsonar.projectKey=jenkins-pipeline-project \
+                            -Dsonar.projectName=jenkins-pipeline-project \
+                            -Dsonar.host.url=http://51.21.190.32:9000'
+                    }
+                }
+            }
+        }
     }
 
     post {
