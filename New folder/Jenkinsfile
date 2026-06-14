@@ -37,7 +37,7 @@ pipeline {
         stage('Static Code Analysis') {
             steps {
                 dir('New folder') {
-                    withSonarQubeEnv('SonarScanner') {
+                    withSonarQubeEnv('SonarQube servers') {
                         sh 'mvn sonar:sonar \
                             -Dsonar.projectKey=jenkins-pipeline-project \
                             -Dsonar.projectName=jenkins-pipeline-project \
