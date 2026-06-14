@@ -8,6 +8,7 @@ pipeline {
 
     stages {
 
+        // Stage 1: Source Code Checkout
         stage('Checkout') {
             steps {
                 git branch: 'main',
@@ -15,6 +16,7 @@ pipeline {
             }
         }
 
+        // Stage 2: Build
         stage('Build') {
             steps {
                 dir('New folder') {
@@ -22,6 +24,18 @@ pipeline {
                 }
             }
         }
+
+        // Stage 3: Unit Testing
+        stage('Unit Testing') {
+            steps {
+                dir('New folder') {
+                    sh 'mvn test'
+                }
+            }
+        }
+
+        // You can add more stages below, like SonarQube, Docker, etc.
+
     }
 
     post {
@@ -30,5 +44,3 @@ pipeline {
         }
     }
 }
-
-
