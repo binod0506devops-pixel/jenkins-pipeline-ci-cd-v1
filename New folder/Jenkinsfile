@@ -2,9 +2,11 @@ pipeline {
     agent any
 
     stages {
+
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/binod0506devops-pixel/jenkins-pipeline-ci-cd-v1.git'
+                git branch: 'main',
+                    url: 'https://github.com/binod0506devops-pixel/jenkins-pipeline-ci-cd-v1.git'
             }
         }
 
@@ -15,6 +17,8 @@ pipeline {
                 }
             }
         }
+
+    }   // closes stages
 
     post {
         always {
