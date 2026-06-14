@@ -1,4 +1,7 @@
+package com.example;
+
 public class App {
+
     public String getMessage() {
         return "Hello, Jenkins!";
     }
@@ -8,4 +11,3 @@ public class App {
         System.out.println(app.getMessage());
     }
 }
-//Added webhook v4

@@ -9,6 +9,7 @@ public class AppTest {
     public void testGetMessage() {
         App app = new App();
         String message = app.getMessage();
+
         assertEquals("Hello, Jenkins!", message);
     }
 }
