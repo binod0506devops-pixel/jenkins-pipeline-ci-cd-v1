@@ -2,12 +2,19 @@ pipeline {
     agent any
 
     options {
+        // Prevent pipeline from running indefinitely
         timeout(time: 10, unit: 'MINUTES')
+
+        // Prevent multiple builds of the same job from running simultaneously
         disableConcurrentBuilds()
     }
 
     stages {
-        // Stage 1: Source Code Checkout
+
+        // ------------------------------------------------------------------
+        // Stage 1: Checkout Source Code
+        // Pull the latest application source code from GitHub repository
+        // ------------------------------------------------------------------
         stage('Checkout') {
             steps {
                 git branch: 'main',
@@ -15,7 +22,10 @@ pipeline {
             }
         }
 
-        // Stage 2: Build
+        // ------------------------------------------------------------------
+        // Stage 2: Build Application
+        // Compile source code and generate deployable artifact (JAR file)
+        // ------------------------------------------------------------------
         stage('Build') {
             steps {
                 dir('New folder') {
@@ -24,7 +34,10 @@ pipeline {
             }
         }
 
-        // Stage 3: Unit Testing
+        // ------------------------------------------------------------------
+        // Stage 3: Execute Unit Tests
+        // Run application unit tests to validate functionality
+        // ------------------------------------------------------------------
         stage('Unit Testing') {
             steps {
                 dir('New folder') {
@@ -33,24 +46,32 @@ pipeline {
             }
         }
 
-        // Stage 4: Static Code Analysis (SonarQube)
+        // ------------------------------------------------------------------
+        // Stage 4: Static Code Analysis
+        // Scan source code using SonarQube for code quality,
+        // bugs, vulnerabilities, and code smells
+        // ------------------------------------------------------------------
         stage('Static Code Analysis') {
             steps {
                 dir('New folder') {
                     withSonarQubeEnv('SonarQube servers') {
                         sh '''
-                            echo "SONAR_HOST_URL=$SONAR_HOST_URL"
+                            echo "Running SonarQube Analysis..."
 
                             mvn sonar:sonar \
                             -Dsonar.projectKey=jenkins-pipeline-project \
                             -Dsonar.projectName=jenkins-pipeline-project
                         '''
                     }
-
                 }
             }
         }
 
+        // ------------------------------------------------------------------
+        // Stage 5: SonarQube Environment Verification
+        // Validate SonarQube environment variables injected by Jenkins
+        // Useful for troubleshooting connectivity issues
+        // ------------------------------------------------------------------
         stage('Debug Sonar') {
             steps {
                 withSonarQubeEnv('SonarQube servers') {
@@ -60,17 +81,34 @@ pipeline {
                 }
             }
         }
+
+        // ------------------------------------------------------------------
+        // Stage 6: Verify Docker Build Context
+        // Confirm Dockerfile, application artifacts,
+        // and required files are available before image creation
+        // ------------------------------------------------------------------
         stage('Verify Dockerfile') {
             steps {
                 dir('New folder') {
                     sh '''
+                        echo "Current Working Directory:"
                         pwd
+
+                        echo "Listing Project Files:"
                         ls -ltr
+
+                        echo "Verifying Generated JAR File:"
+                        ls -ltr target/*.jar
                     '''
                 }
             }
         }
 
+        // ------------------------------------------------------------------
+        // Stage 7: Build Docker Image
+        // Package application into a Docker container image
+        // Tag image using Jenkins build number for traceability
+        // ------------------------------------------------------------------
         stage('Docker Image Build') {
             steps {
                 dir('New folder') {
@@ -84,51 +122,53 @@ pipeline {
                 }
             }
         }
-stage('Docker Push') {
-    steps {
-        withCredentials([
-            usernamePassword(
-                credentialsId: 'dockerhub-creds',
-                usernameVariable: 'DOCKER_USER',
-                passwordVariable: 'DOCKER_PASS'
-            )
-        ]) {
-            sh '''
-                echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
-                docker push binod0506/jenkins-pipeline-project:${BUILD_NUMBER}
-            '''
+        // ------------------------------------------------------------------
+        // Stage 8: Push Docker Image to Docker Hub
+        // Authenticate with Docker Hub using Jenkins credentials
+        // and push the versioned image to remote registry
+        // ------------------------------------------------------------------
+        stage('Docker Push') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+                    sh '''
+                        echo "Authenticating to Docker Hub..."
+
+                        echo "$DOCKER_PASS" | docker login \
+                        -u "$DOCKER_USER" \
+                        --password-stdin
+
+                        echo "Pushing Docker Image to Docker Hub..."
+
+                        docker push \
+                        binod0506devops/jenkins-pipeline-project:${BUILD_NUMBER}
+                    '''
+                }
+            }
         }
-    }
-}
-
-stage('Docker Image Build') {
-    steps {
-        dir('New folder') {
-            sh '''
-                docker build -t binod0506/jenkins-pipeline-project:${BUILD_NUMBER} .
-            '''
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
     post {
+
+        // Execute regardless of pipeline result
         always {
-            echo 'Pipeline finished.'
+            echo 'Pipeline execution completed.'
+        }
+
+        // Execute when pipeline succeeds
+        success {
+            echo 'CI Pipeline completed successfully.'
+        }
+
+        // Execute when pipeline fails
+        failure {
+            echo 'CI Pipeline execution failed. Please review build logs.'
         }
     }
 }
