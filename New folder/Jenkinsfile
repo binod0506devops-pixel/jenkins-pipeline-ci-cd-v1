@@ -60,6 +60,17 @@ pipeline {
                 }
             }
         }
+        stage('Verify Dockerfile') {
+            steps {
+                dir('New folder') {
+                    sh '''
+                        pwd
+                        ls -ltr
+                    '''
+                }
+            }
+        }
+
     }
 
     post {
