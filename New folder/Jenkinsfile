@@ -116,7 +116,7 @@ pipeline {
                         echo "Building Docker Image..."
 
                         docker build \
-                        -t binod0506devops/jenkins-pipeline-project:${BUILD_NUMBER} \
+                        -t binod0506/jenkins-pipeline-project:${BUILD_NUMBER} \
                         .
                     '''
                 }
@@ -147,7 +147,7 @@ pipeline {
                         echo "Pushing Docker Image to Docker Hub..."
 
                         docker push \
-                        binod0506devops/jenkins-pipeline-project:${BUILD_NUMBER}
+                        binod0506/jenkins-pipeline-project:${BUILD_NUMBER}
                     '''
                 }
             }
