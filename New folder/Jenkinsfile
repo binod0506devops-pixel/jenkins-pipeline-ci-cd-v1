@@ -41,7 +41,7 @@ pipeline {
                         sh 'mvn sonar:sonar \
                             -Dsonar.projectKey=jenkins-pipeline-project \
                             -Dsonar.projectName=jenkins-pipeline-project \
-                            -Dsonar.host.url=http://51.21.190.32:9000'
+                            -Dsonar.host.url=http://13.53.129.195:9000'
                     }
                 }
             }
