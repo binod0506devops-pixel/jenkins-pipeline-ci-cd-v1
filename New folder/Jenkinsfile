@@ -38,11 +38,25 @@ pipeline {
             steps {
                 dir('New folder') {
                     withSonarQubeEnv('SonarQube servers') {
-                        sh 'mvn sonar:sonar \
+                        sh '''
+                            echo "SONAR_HOST_URL=$SONAR_HOST_URL"
+
+                            mvn sonar:sonar \
                             -Dsonar.projectKey=jenkins-pipeline-project \
-                            -Dsonar.projectName=jenkins-pipeline-project \
-                            -Dsonar.host.url=http://13.53.129.195:9000'
+                            -Dsonar.projectName=jenkins-pipeline-project
+                        '''
                     }
+
+                }
+            }
+        }
+
+        stage('Debug Sonar') {
+            steps {
+                withSonarQubeEnv('SonarQube servers') {
+                    sh '''
+                        env | grep SONAR
+                    '''
                 }
             }
         }
