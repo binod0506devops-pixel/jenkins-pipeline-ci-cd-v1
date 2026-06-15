@@ -71,6 +71,21 @@ pipeline {
             }
         }
 
+        stage('Docker Image Build') {
+            steps {
+                dir('New folder') {
+                    sh '''
+                        echo "Building Docker Image..."
+
+                        docker build \
+                        -t binod0506devops/jenkins-pipeline-project:${BUILD_NUMBER} \
+                        .
+                    '''
+                }
+            }
+        }
+
+
     }
 
     post {
